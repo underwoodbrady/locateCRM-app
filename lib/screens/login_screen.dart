@@ -1,6 +1,6 @@
+// screens/login_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../providers/auth_provider.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -17,6 +17,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authProvider);
+
     return Scaffold(
       appBar: AppBar(title: const Text('Login')),
       body: Form(
@@ -44,30 +46,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 return null;
               },
             ),
-           ElevatedButton(
-              onPressed: () async {
-                if (_formKey.currentState!.validate()) {
-                  try {
-                    await ref.read(authProvider.notifier).signIn(
-                          email: _emailController.text,
-                          password: _passwordController.text,
-                        );
-                    final user = ref.read(authProvider).user;
-                    if (user != null && !user.isVerified) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Please verify your email before logging in')),
-                      );
-                      ref.read(authProvider.notifier).signOut();
-                    }
-                  } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(e.toString())),
-                    );
-                  }
-                }
-              },
-              child: const Text('Login'),
-            ),
+            authState.isLoading
+                ? const CircularProgressIndicator()
+                : ElevatedButton(
+                    onPressed: _handleLogin,
+                    child: const Text('Login'),
+                  ),
             TextButton(
               onPressed: () {
                 Navigator.pushNamed(context, '/signup');
@@ -78,5 +62,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ),
       ),
     );
+  }
+
+  void _handleLogin() async {
+    if (_formKey.currentState!.validate()) {
+      await ref.read(authProvider.notifier).signIn(
+            email: _emailController.text,
+            password: _passwordController.text,
+          );
+    }
   }
 }

@@ -1,7 +1,7 @@
+// screens/signup_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../providers/auth_provider.dart';
 import 'verify_email.dart';
 
@@ -20,6 +20,8 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authProvider);
+
     if (!kIsWeb) {
       return Scaffold(
         appBar: AppBar(title: const Text('Sign Up')),
@@ -66,32 +68,38 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                 return null;
               },
             ),
-             ElevatedButton(
-              onPressed: () async {
-                if (_formKey.currentState!.validate()) {
-                  try {
-                    await ref.read(authProvider.notifier).signUp(
-                          email: _emailController.text,
-                          password: _passwordController.text,
-                          name: _nameController.text,
-                        );
-                    Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(
-                        builder: (context) => const VerifyEmailScreen(),
-                      ),
-                    );
-                  } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(e.toString())),
-                    );
-                  }
-                }
-              },
-              child: const Text('Sign Up'),
-            ),
+            authState.isLoading
+                ? const CircularProgressIndicator()
+                : ElevatedButton(
+                    onPressed: _handleSignup,
+                    child: const Text('Sign Up'),
+                  ),
           ],
         ),
       ),
     );
+  }
+
+  void _handleSignup() async {
+    if (_formKey.currentState!.validate()) {
+      try {
+        await ref.read(authProvider.notifier).signUp(
+              email: _emailController.text,
+              password: _passwordController.text,
+              name: _nameController.text,
+            );
+        // Only navigate to VerifyEmailScreen if sign up was successful
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => const VerifyEmailScreen(),
+          ),
+        );
+      } catch (e) {
+        // Show error message if sign up failed
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: ${e.toString()}')),
+        );
+      }
+    }
   }
 }

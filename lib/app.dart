@@ -19,15 +19,29 @@ class MyApp extends ConsumerWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: authState.isLoading
-          ? const Scaffold(body: Center(child: CircularProgressIndicator()))
-          : authState.user == null
+      home: authState.user == null
               ? const LoginScreen()
               : authState.user!.isVerified
                   ? (authState.user!.organizationId == null
                       ? const OrganizationSetupScreen()
                       : const HomeScreen())
                   : const LoginScreen(),
+      builder: (context, child) {
+        return Consumer(
+          builder: (context, ref, _) {
+            final error = ref.watch(authProvider.select((state) => state.error));
+            if (error != null) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(error)),
+                );
+                ref.read(authProvider.notifier).state = ref.read(authProvider.notifier).state.copyWith(error: null);
+              });
+            }
+            return child!;
+          },
+        );
+      },
       routes: {
         '/login': (context) => const LoginScreen(),
         '/signup': (context) => const SignupScreen(),

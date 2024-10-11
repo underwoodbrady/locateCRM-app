@@ -10,8 +10,17 @@ final supabaseClientProvider = Provider<SupabaseClient>((ref) {
 class AuthState {
   final UserModel? user;
   final bool isLoading;
+  final String? error;
 
-  AuthState({this.user, this.isLoading = false});
+  AuthState({this.user, this.isLoading = false, this.error});
+
+  AuthState copyWith({UserModel? user, bool? isLoading, String? error}) {
+    return AuthState(
+      user: user ?? this.user,
+      isLoading: isLoading ?? this.isLoading,
+      error: error,
+    );
+  }
 }
 
 class AuthNotifier extends StateNotifier<AuthState> {
@@ -44,34 +53,32 @@ class AuthNotifier extends StateNotifier<AuthState> {
         state = AuthState(isLoading: false);
       }
     } catch (e) {
-      print('Error fetching user: $e');
-      state = AuthState(isLoading: false);
+      state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
 
   Future<void> signUp({required String email, required String password, required String name}) async {
-  if (!kIsWeb) {
-    throw Exception('Sign up is only available on web');
+    if (!kIsWeb) {
+      throw Exception('Sign up is only available on web');
+    }
+    state = state.copyWith(isLoading: true, error: null);
+    try {
+      final response = await _supabaseClient.auth.signUp(
+        email: email,
+        password: password,
+        data: {'name': name},
+      );
+      
+      // The trigger will automatically create the user record in public.users
+      
+      state = state.copyWith(isLoading: false);
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+    }
   }
-  state = AuthState(isLoading: true);
-  try {
-    final response = await _supabaseClient.auth.signUp(
-      email: email,
-      password: password,
-      data: {'name': name},  // Include the name in the user metadata
-    );
-    
-    // The trigger will automatically create the user record in public.users
-    
-    state = AuthState(isLoading: false);
-  } catch (e) {
-    state = AuthState(isLoading: false);
-    rethrow;
-  }
-}
 
-   Future<void> signIn({required String email, required String password}) async {
-    state = AuthState(isLoading: true);
+  Future<void> signIn({required String email, required String password}) async {
+    state = state.copyWith(isLoading: true, error: null);
     try {
       final response = await _supabaseClient.auth.signInWithPassword(
         email: email,
@@ -84,8 +91,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
         await _updateEmailVerificationStatus(response.user!.id);
       }
     } catch (e) {
-      state = AuthState(isLoading: false);
-      rethrow;
+      state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
 
@@ -95,10 +101,14 @@ class AuthNotifier extends StateNotifier<AuthState> {
     await _fetchUser(userId);
   }
 
-
   Future<void> signOut() async {
-    await _supabaseClient.auth.signOut();
-    state = AuthState(isLoading: false);
+    state = state.copyWith(isLoading: true, error: null);
+    try {
+      await _supabaseClient.auth.signOut();
+      state = AuthState(isLoading: false);
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+    }
   }
 }
 
