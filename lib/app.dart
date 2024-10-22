@@ -21,7 +21,7 @@ class MyApp extends ConsumerWidget {
       home: authState.when(
         data: (user) {
           if (user == null) {
-            return const LoginScreen();
+            return const SignUpScreen();
           }
           return const MainAppDashboard();
         },

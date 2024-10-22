@@ -8,7 +8,6 @@ class User {
   final bool isVerified;
   final DateTime lastActive;
   final DateTime lastSync;
-  final DateTime createdAt;
 
   User({
     required this.id,
@@ -18,7 +17,6 @@ class User {
     required this.isVerified,
     required this.lastActive,
     required this.lastSync,
-    required this.createdAt
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -30,7 +28,6 @@ class User {
       isVerified: json['is_verified'],
       lastActive: DateTime.parse(json['last_active']),
       lastSync: DateTime.parse(json['last_sync']),
-      createdAt: DateTime.parse(json['created_at']),
     );
   }
 
@@ -43,7 +40,6 @@ class User {
       'is_verified': isVerified,
       'last_active': lastActive.toIso8601String(),
       'last_sync': lastSync.toIso8601String(),
-      'created_at': createdAt.toIso8601String(),
     };
   }
 }

@@ -22,6 +22,9 @@ class AuthService {
   Future<User> signIn(String email, String password) async {
     final response = await _supabase.auth
         .signInWithPassword(email: email, password: password);
+
+    print(response);
+
     if (response.user == null) {
       throw Exception('Login failed');
     }
@@ -31,36 +34,35 @@ class AuthService {
         .eq('id', response.user!.id)
         .single();
 
-    if (response.user != null) {
-      return User.fromJson(userResponse);
+    print(userResponse);
+
+    try {
+      final tempUser = User.fromJson(userResponse);
+      // Check if the email is verified and update the user table if necessary
+      if (response.user!.emailConfirmedAt != null && !tempUser.isVerified) {
+        await _updateEmailVerificationStatus(response.user!.id);
+      }
+      return tempUser;
+    } catch (e) {
+      throw Exception('User data not found');
     }
-    throw Exception('User data not found');
   }
 
-  Future<User> signUp(String email, String password, String name) async {
+  Future<void> _updateEmailVerificationStatus(String userId) async {
+    await _supabase
+        .from('users')
+        .update({'is_verified': true}).eq('id', userId);
+  }
+
+  Future<void> signUp(String email, String password, String name) async {
     final response = await _supabase.auth.signUp(
-      email:email,
-      password:password,
+      email: email,
+      password: password,
       data: {'name': name},
     );
     if (response.user == null) {
       throw Exception('Sign up failed');
     }
-
-    // Create user record in the users table
-    final userResponse = await _supabase.from('users').insert({
-      'id': response.user!.id,
-      'email': email,
-      'name': name,
-      'is_verified': false,
-      'last_active': DateTime.now().toIso8601String(),
-      'last_sync': DateTime.now().toIso8601String(),
-    });
-
-    if (response.user != null) {
-      return User.fromJson(userResponse.data[0]);
-    }
-    throw Exception('Failed to create user record');
   }
 
   Future<void> signOut() async {

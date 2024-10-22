@@ -9,7 +9,7 @@ class VerifyEmailScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Verify Email'),
       ),
-      body: Center(
+      body: const Center(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(

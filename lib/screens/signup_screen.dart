@@ -89,6 +89,13 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                 },
                 child: const Text('Sign Up'),
               ),
+              const SizedBox(height: 16),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pushReplacementNamed('/login');
+                },
+                child: const Text('Sign In Instead'),
+              ),
             ],
           ),
         ),
