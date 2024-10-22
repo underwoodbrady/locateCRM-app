@@ -30,4 +30,15 @@ class OrganizationNotifier extends StateNotifier<AsyncValue<Organization?>> {
       state = AsyncValue.error(e, StackTrace.current);
     }
   }
+  
+  Future<void> joinOrganization(String organizationId) async {
+    state = const AsyncValue.loading();
+    try {
+      await _supabaseService.joinOrganization(organizationId);
+      final organization = await _supabaseService.getOrganization(organizationId);
+      state = AsyncValue.data(organization);
+    } catch (e) {
+      state = AsyncValue.error(e, StackTrace.current);
+    }
+  }
 }

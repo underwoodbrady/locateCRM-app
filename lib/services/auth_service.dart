@@ -23,8 +23,6 @@ class AuthService {
     final response = await _supabase.auth
         .signInWithPassword(email: email, password: password);
 
-    print(response);
-
     if (response.user == null) {
       throw Exception('Login failed');
     }
@@ -33,8 +31,6 @@ class AuthService {
         .select()
         .eq('id', response.user!.id)
         .single();
-
-    print(userResponse);
 
     try {
       final tempUser = User.fromJson(userResponse);

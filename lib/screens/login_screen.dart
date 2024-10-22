@@ -13,7 +13,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-    bool _isLoading = false;
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -58,7 +58,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 },
               ),
               const SizedBox(height: 24),
-               ElevatedButton(
+              ElevatedButton(
                 onPressed: _isLoading ? null : _handleLogin,
                 child: _isLoading
                     ? const CircularProgressIndicator()
@@ -88,7 +88,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               _emailController.text,
               _passwordController.text,
             );
-        Navigator.of(context).pushReplacementNamed('/dashboard');
+        final inOrganization = ref.read(authProvider)?.organizationId;
+        print('test $inOrganization');
+        if (inOrganization != null) {
+          Navigator.of(context).pushReplacementNamed('/dashboard');
+        } else {
+          Navigator.of(context).pushReplacementNamed('/setup_organization');
+        }
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error: $e')),

@@ -18,6 +18,22 @@ class SupabaseService {
     return Organization.fromJson(response);
   }
 
+  Future<void> joinOrganization(String organizationId) async {
+    final user = _supabase.auth.currentUser;
+    if (user == null) {
+      throw Exception('User not authenticated');
+    }
+
+    final response = await _supabase
+        .from('users')
+        .update({'organization_id': organizationId})
+        .eq('id', user.id);
+
+    if (response.error != null) {
+      throw Exception('Failed to join organization: ${response.error!.message}');
+    }
+  }
+
   Future<Organization> createOrganization(Organization organization) async {
     final response = await _supabase
         .from('organization')
