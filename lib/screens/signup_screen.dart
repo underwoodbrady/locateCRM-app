@@ -14,6 +14,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _nameController = TextEditingController();
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -71,23 +72,10 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
               ),
               const SizedBox(height: 24),
               ElevatedButton(
-                onPressed: () async {
-                  if (_formKey.currentState!.validate()) {
-                    try {
-                      await ref.read(authProvider.notifier).signUp(
-                            _emailController.text,
-                            _passwordController.text,
-                            _nameController.text,
-                          );
-                      Navigator.of(context).pushReplacementNamed('/dashboard');
-                    } catch (e) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Error: $e')),
-                      );
-                    }
-                  }
-                },
-                child: const Text('Sign Up'),
+                onPressed: _isLoading ? null : _handleSignUp,
+                child: _isLoading
+                    ? const CircularProgressIndicator()
+                    : const Text('Sign Up'),
               ),
               const SizedBox(height: 16),
               TextButton(
@@ -101,5 +89,29 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _handleSignUp() async {
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+      try {
+        await ref.read(authProvider.notifier).signUp(
+              _emailController.text,
+              _passwordController.text,
+              _nameController.text,
+            );
+        Navigator.of(context).pushReplacementNamed('/verify_email');
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 }

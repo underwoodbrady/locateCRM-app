@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:locatecrm_app/screens/verify_email_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/signup_screen.dart';
 import 'screens/get_free_trial_screen.dart';
@@ -11,28 +12,20 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authState = ref.watch(authProvider);
+    final user = ref.watch(authProvider);
 
     return MaterialApp(
       title: 'Sales Platform',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: authState.when(
-        data: (user) {
-          if (user == null) {
-            return const SignUpScreen();
-          }
-          return const MainAppDashboard();
-        },
-        loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
-        error: (_, __) => const Scaffold(body: Center(child: Text('An error occurred'))),
-      ),
+      home: user != null ? (user.isVerified == false ? MainAppDashboard() : VerifyEmailScreen()): SignUpScreen(),
       routes: {
         '/login': (context) => const LoginScreen(),
         '/signup': (context) => const SignUpScreen(),
         '/freetrial': (context) => const GetFreeTrialScreen(),
         '/dashboard': (context) => const MainAppDashboard(),
+        '/verify_email': (context) => const VerifyEmailScreen(),
       },
     );
   }

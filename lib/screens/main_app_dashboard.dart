@@ -7,7 +7,7 @@ class MainAppDashboard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authState = ref.watch(authProvider);
+    final user = ref.watch(authProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -22,16 +22,9 @@ class MainAppDashboard extends ConsumerWidget {
         ],
       ),
       body: Center(
-        child: authState.when(
-          data: (user) {
-            if (user == null) {
-              return const Text('Not logged in');
-            }
-            return Text('Welcome, ${user.name}!');
-          },
-          loading: () => const CircularProgressIndicator(),
-          error: (error, stack) => Text('Error: $error'),
-        ),
+        child: user == null
+            ? const Text('Not logged in')
+            : Text('Welcome, ${user.name}!'),
       ),
     );
   }
