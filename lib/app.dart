@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'screens/login_screen.dart';
 import 'screens/signup_screen.dart';
-import 'screens/home_screen.dart';
-import 'screens/organization_setup_screen.dart';
+import 'screens/get_free_trial_screen.dart';
+import 'screens/main_app_dashboard.dart';
 import 'providers/auth_provider.dart';
 
 class MyApp extends ConsumerWidget {
@@ -17,34 +17,22 @@ class MyApp extends ConsumerWidget {
       title: 'Sales Platform',
       theme: ThemeData(
         primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: authState.user == null
-              ? const LoginScreen()
-              : authState.user!.isVerified
-                  ? (authState.user!.organizationId == null
-                      ? const OrganizationSetupScreen()
-                      : const HomeScreen())
-                  : const LoginScreen(),
-      builder: (context, child) {
-        return Consumer(
-          builder: (context, ref, _) {
-            final error = ref.watch(authProvider.select((state) => state.error));
-            if (error != null) {
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(error)),
-                );
-                ref.read(authProvider.notifier).state = ref.read(authProvider.notifier).state.copyWith(error: null);
-              });
-            }
-            return child!;
-          },
-        );
-      },
+      home: authState.when(
+        data: (user) {
+          if (user == null) {
+            return const LoginScreen();
+          }
+          return const MainAppDashboard();
+        },
+        loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
+        error: (_, __) => const Scaffold(body: Center(child: Text('An error occurred'))),
+      ),
       routes: {
         '/login': (context) => const LoginScreen(),
-        '/signup': (context) => const SignupScreen(),
+        '/signup': (context) => const SignUpScreen(),
+        '/freetrial': (context) => const GetFreeTrialScreen(),
+        '/dashboard': (context) => const MainAppDashboard(),
       },
     );
   }

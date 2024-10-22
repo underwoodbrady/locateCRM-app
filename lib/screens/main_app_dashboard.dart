@@ -1,10 +1,9 @@
-// screens/home_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/auth_provider.dart';
 
-class HomeScreen extends ConsumerWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+class MainAppDashboard extends ConsumerWidget {
+  const MainAppDashboard({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -12,7 +11,7 @@ class HomeScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Home'),
+        title: const Text('Dashboard'),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -23,13 +22,15 @@ class HomeScreen extends ConsumerWidget {
         ],
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('Welcome, ${authState.user?.email ?? 'User'}!'),
-            const SizedBox(height: 20),
-            const Text('This is a temporary home screen.'),
-          ],
+        child: authState.when(
+          data: (user) {
+            if (user == null) {
+              return const Text('Not logged in');
+            }
+            return Text('Welcome, ${user.name}!');
+          },
+          loading: () => const CircularProgressIndicator(),
+          error: (error, stack) => Text('Error: $error'),
         ),
       ),
     );

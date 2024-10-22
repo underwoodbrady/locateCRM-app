@@ -1,117 +1,51 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/user.dart';
+import '../services/auth_service.dart';
 
-final supabaseClientProvider = Provider<SupabaseClient>((ref) {
-  return Supabase.instance.client;
+final authProvider = StateNotifierProvider<AuthNotifier, AsyncValue<User?>>((ref) {
+  return AuthNotifier(AuthService());
 });
 
-class AuthState {
-  final UserModel? user;
-  final bool isLoading;
-  final String? error;
+class AuthNotifier extends StateNotifier<AsyncValue<User?>> {
+  final AuthService _authService;
 
-  AuthState({this.user, this.isLoading = false, this.error});
-
-  AuthState copyWith({UserModel? user, bool? isLoading, String? error}) {
-    return AuthState(
-      user: user ?? this.user,
-      isLoading: isLoading ?? this.isLoading,
-      error: error,
-    );
-  }
-}
-
-class AuthNotifier extends StateNotifier<AuthState> {
-  final SupabaseClient _supabaseClient;
-
-  AuthNotifier(this._supabaseClient) : super(AuthState(isLoading: true)) {
+  AuthNotifier(this._authService) : super(const AsyncValue.loading()) {
     _init();
   }
 
   Future<void> _init() async {
-    final session = _supabaseClient.auth.currentSession;
-    if (session != null) {
-      await _fetchUser(session.user.id);
-    } else {
-      state = AuthState(isLoading: false);
-    }
-  }
-
-  Future<void> _fetchUser(String userId) async {
+    state = const AsyncValue.loading();
     try {
-      final response = await _supabaseClient
-          .from('users')
-          .select()
-          .eq('id', userId)
-          .single();
-      
-      if (response != null) {
-        state = AuthState(user: UserModel.fromJson(response), isLoading: false);
-      } else {
-        state = AuthState(isLoading: false);
-      }
+      final user = await _authService.getCurrentUser();
+      state = AsyncValue.data(user);
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
+      state = AsyncValue.error(e, StackTrace.current);
     }
   }
 
-  Future<void> signUp({required String email, required String password, required String name}) async {
-    if (!kIsWeb) {
-      throw Exception('Sign up is only available on web');
-    }
-    state = state.copyWith(isLoading: true, error: null);
+  Future<void> signIn(String email, String password) async {
+    state = const AsyncValue.loading();
     try {
-      final response = await _supabaseClient.auth.signUp(
-        email: email,
-        password: password,
-        data: {'name': name},
-      );
-      
-      // The trigger will automatically create the user record in public.users
-      
-      state = state.copyWith(isLoading: false);
+      final user = await _authService.signIn(email, password);
+      state = AsyncValue.data(user);
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
+      state = AsyncValue.error(e, StackTrace.current);
     }
   }
 
-  Future<void> signIn({required String email, required String password}) async {
-    state = state.copyWith(isLoading: true, error: null);
+  Future<void> signUp(String email, String password, String name) async {
+    state = const AsyncValue.loading();
     try {
-      final response = await _supabaseClient.auth.signInWithPassword(
-        email: email,
-        password: password,
-      );
-      await _fetchUser(response.user!.id);
-      
-      // Check if the email is verified and update the user table if necessary
-      if (response.user!.emailConfirmedAt != null && state.user != null && !state.user!.isVerified) {
-        await _updateEmailVerificationStatus(response.user!.id);
-      }
+      final user = await _authService.signUp(email, password, name);
+      state = AsyncValue.data(user);
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
+      state = AsyncValue.error(e, StackTrace.current);
     }
-  }
-
-  Future<void> _updateEmailVerificationStatus(String userId) async {
-    await _supabaseClient.from('users').update({'is_verified': true}).eq('id', userId);
-    // Fetch the updated user data
-    await _fetchUser(userId);
   }
 
   Future<void> signOut() async {
-    state = state.copyWith(isLoading: true, error: null);
-    try {
-      await _supabaseClient.auth.signOut();
-      state = AuthState(isLoading: false);
-    } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
-    }
+    await _authService.signOut();
+    state = const AsyncValue.data(null);
   }
 }
 
-final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
-  return AuthNotifier(ref.watch(supabaseClientProvider));
-});
