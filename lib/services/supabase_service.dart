@@ -1,4 +1,4 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' hide User;
 import '../models/organization.dart';
 
 class SupabaseService {
@@ -8,24 +8,38 @@ class SupabaseService {
   final userId = _supabase.auth.currentUser?.id;
   if (userId == null) throw Exception('User not authenticated');
 
-  // Create organization
-  final orgResponse = await _supabase
-      .from('organization')
-      .insert({
-        'owner_id': userId,
-        'subscription_status': 'pending',
-        'created_at': DateTime.now().toIso8601String(),
-      })
-      .select()
+  // First check if user already has an organization
+  final userResponse = await _supabase
+      .from('users')
+      .select('organization_id')
+      .eq('id', userId)
       .single();
 
-  final organizationId = orgResponse['id'];
+  String organizationId;
 
-  // Update user's organization_id
-  await _supabase
-      .from('users')
-      .update({'organization_id': organizationId})
-      .eq('id', userId);
+  if (userResponse['organization_id'] != null) {
+    // Use existing organization
+    organizationId = userResponse['organization_id'];
+  } else {
+    // Create new organization with admin user in users array
+    final orgResponse = await _supabase
+        .from('organization')
+        .insert({
+          'owner_id': userId,
+          'subscription_status': 'pending',
+          'created_at': DateTime.now().toIso8601String(),
+        })
+        .select()
+        .single();
+
+    organizationId = orgResponse['id'];
+
+    // Update user's organization_id
+    await _supabase
+        .from('users')
+        .update({'organization_id': organizationId})
+        .eq('id', userId);
+  }
 
   return organizationId;
 }
