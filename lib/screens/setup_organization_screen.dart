@@ -90,24 +90,38 @@ class _OrganizationSetupScreenState extends ConsumerState<OrganizationSetupScree
   }
 
   Future<void> _handleJoinOrganization() async {
-    if (_formKey.currentState!.validate()) {
+  if (_formKey.currentState!.validate()) {
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      await ref.read(organizationProvider.notifier).joinOrganization(
+            _organizationIdController.text,
+          );
+      
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Successfully joined organization'),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      // Navigate to dashboard
+      Navigator.of(context).pushReplacementNamed('/dashboard');
+    } catch (e) {
+      // Show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString()),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
       setState(() {
-        _isLoading = true;
+        _isLoading = false;
       });
-      try {
-        await ref.read(organizationProvider.notifier).joinOrganization(
-              _organizationIdController.text
-            );
-        Navigator.of(context).pushReplacementNamed('/dashboard');
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
-      } finally {
-        setState(() {
-          _isLoading = false;
-        });
-      }
     }
   }
+}
 }

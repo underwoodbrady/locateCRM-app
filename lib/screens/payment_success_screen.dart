@@ -6,7 +6,6 @@ import 'dart:async';
 import 'package:locatecrm_app/providers/organization_provider.dart';
 
 class PaymentSuccessScreen extends ConsumerStatefulWidget {
-
   const PaymentSuccessScreen({
     Key? key,
   }) : super(key: key);
@@ -44,7 +43,8 @@ class _PaymentSuccessScreenState extends ConsumerState<PaymentSuccessScreen> {
   Future<void> _checkStatus() async {
     try {
       final user = ref.watch(authProvider);
-      final isReady = await ref.read(organizationProvider.notifier)
+      final isReady = await ref
+          .read(organizationProvider.notifier)
           .checkOrganizationStatus(user?.organizationId);
 
       if (isReady) {
@@ -54,7 +54,7 @@ class _PaymentSuccessScreenState extends ConsumerState<PaymentSuccessScreen> {
         });
         // Navigate to dashboard after a short delay
         Future.delayed(const Duration(seconds: 2), () {
-          Navigator.of(context).pushReplacementNamed('/dashboard');
+          Navigator.of(context).pushReplacementNamed('/finalize_organization');
         });
       }
     } catch (e) {
@@ -100,7 +100,7 @@ class _PaymentSuccessScreenState extends ConsumerState<PaymentSuccessScreen> {
                 ),
                 const SizedBox(height: 16),
                 const Text(
-                  'Redirecting to dashboard...',
+                  'Redirecting to final setup...',
                   style: TextStyle(color: Colors.grey),
                 ),
               ],

@@ -72,12 +72,35 @@ class OrganizationNotifier extends StateNotifier<AsyncValue<Organization?>> {
   Future<void> joinOrganization(String organizationId) async {
     state = const AsyncValue.loading();
     try {
-      await _supabaseService.joinOrganization(organizationId);
-      final organization =
-          await _supabaseService.getOrganization(organizationId);
+      final organization = await _supabaseService.joinOrganization(organizationId);
       state = AsyncValue.data(organization);
     } catch (e) {
       state = AsyncValue.error(e, StackTrace.current);
+      rethrow;
+    }
+  }
+
+  Future<void> updateOrganizationDetails({
+    required String name,
+    required String businessType,
+  }) async {
+    try {
+      final updatedOrg = await _supabaseService.updateOrganizationDetails(
+        name: name,
+        businessType: businessType,
+      );
+      state = AsyncValue.data(updatedOrg);
+    } catch (e) {
+      throw Exception('Failed to update organization details: $e');
+    }
+  }
+
+  Future<void> inviteMember(String email) async {
+    try {
+      final updatedOrg = await _supabaseService.inviteUserToOrganization(email);
+      state = AsyncValue.data(updatedOrg);
+    } catch (e) {
+      throw Exception('Failed to invite member: $e');
     }
   }
 }
