@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:locatecrm_app/screens/setup_organization_setup_screen.dart';
-import 'package:locatecrm_app/screens/setup_payment_screen.dart';
+import 'package:locatecrm_app/screens/payment_success_screen.dart';
+import 'package:locatecrm_app/screens/setup_organization_screen.dart';
+import 'package:locatecrm_app/screens/choose_plan_screen.dart';
 import 'package:locatecrm_app/screens/verify_email_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/signup_screen.dart';
@@ -35,7 +36,8 @@ class MyApp extends ConsumerWidget {
         '/dashboard': (context) => const MainAppDashboard(),
         '/verify_email': (context) => const VerifyEmailScreen(),
         '/setup_organization': (context) => const OrganizationSetupScreen(),
-        '/setup_payment': (context) => const PaymentSetupScreen(),
+        '/choose_plan': (context) => const ChoosePlanScreen(),
+        '/payment_success': (context) => PaymentSuccessScreen(),
       },
     );
   }

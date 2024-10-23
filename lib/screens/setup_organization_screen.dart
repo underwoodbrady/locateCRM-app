@@ -45,7 +45,7 @@ class _OrganizationSetupScreenState extends ConsumerState<OrganizationSetupScree
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () {
-                  Navigator.of(context).pushReplacementNamed('/setup_payment');
+                  Navigator.of(context).pushReplacementNamed('/choose_plan');
                 },
                 child: const Text('Create an Organization'),
               ),
@@ -96,7 +96,7 @@ class _OrganizationSetupScreenState extends ConsumerState<OrganizationSetupScree
       });
       try {
         await ref.read(organizationProvider.notifier).joinOrganization(
-              _organizationIdController.text,
+              _organizationIdController.text
             );
         Navigator.of(context).pushReplacementNamed('/dashboard');
       } catch (e) {
