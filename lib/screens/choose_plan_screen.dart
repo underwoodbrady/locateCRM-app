@@ -5,7 +5,7 @@ import 'dart:html' as html;
 import '../providers/organization_provider.dart'; // Only for web platform
 
 class ChoosePlanScreen extends ConsumerStatefulWidget {
-  const ChoosePlanScreen({Key? key}) : super(key: key);
+  const ChoosePlanScreen({super.key});
 
   @override
   _ChoosePlanScreenState createState() => _ChoosePlanScreenState();

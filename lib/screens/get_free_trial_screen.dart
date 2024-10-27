@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class GetFreeTrialScreen extends StatelessWidget {
-  const GetFreeTrialScreen({Key? key}) : super(key: key);
+  const GetFreeTrialScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

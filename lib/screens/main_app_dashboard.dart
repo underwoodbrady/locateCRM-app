@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/auth_provider.dart';
 
 class MainAppDashboard extends ConsumerWidget {
-  const MainAppDashboard({Key? key}) : super(key: key);
+  const MainAppDashboard({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

@@ -6,7 +6,7 @@ import 'dart:html' as html;
 import 'package:locatecrm_app/providers/organization_provider.dart';
 
 class FinalizeOrganizationScreen extends ConsumerStatefulWidget {
-  const FinalizeOrganizationScreen({Key? key}) : super(key: key);
+  const FinalizeOrganizationScreen({super.key});
 
   @override
   _FinalizeOrganizationScreenState createState() =>

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class VerifyEmailScreen extends StatelessWidget {
-  const VerifyEmailScreen({Key? key}) : super(key: key);
+  const VerifyEmailScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -11,21 +11,21 @@ class VerifyEmailScreen extends StatelessWidget {
       ),
       body: const Center(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: EdgeInsets.all(16.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              Text(
+            children: [
+              const Text(
                 'Please verify your email',
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
-              SizedBox(height: 16),
-              Text(
+              const SizedBox(height: 16),
+              const Text(
                 'We\'ve sent you a verification email. Please check your inbox and click the verification link.',
                 textAlign: TextAlign.center,
               ),
-              SizedBox(height: 16),
-              Text(
+              const SizedBox(height: 16),
+              const Text(
                 'Once you\'ve verified your email, you can close this tab and log in to your account.',
                 textAlign: TextAlign.center,
               ),

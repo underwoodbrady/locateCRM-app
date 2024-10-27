@@ -37,16 +37,6 @@ class OrganizationNotifier extends StateNotifier<AsyncValue<Organization?>> {
     return null;
   }
 
-  // Future<bool> checkOrganizationStatus(String organizationId) async {
-  //   try {
-  //     final organization =
-  //         await _supabaseService.getOrganization(organizationId);
-  //     return organization.stripeSubscriptionId != null;
-  //   } catch (e) {
-  //     return false;
-  //   }
-  // }
-
   Future<bool> checkOrganizationStatus(String? organizationId) async {
     if (organizationId == null) {
       throw Exception('OrganizationID is null');

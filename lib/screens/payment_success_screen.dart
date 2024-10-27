@@ -7,8 +7,8 @@ import 'package:locatecrm_app/providers/organization_provider.dart';
 
 class PaymentSuccessScreen extends ConsumerStatefulWidget {
   const PaymentSuccessScreen({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   _PaymentSuccessScreenState createState() => _PaymentSuccessScreenState();

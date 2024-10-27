@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:locatecrm_app/screens/unknown_route_screen.dart';
 import 'screens/finalize_organization_screen.dart';
 import 'screens/payment_success_screen.dart';
 import 'screens/setup_organization_screen.dart';
@@ -16,7 +17,7 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(authProvider);
+    var user = ref.watch(authProvider);
 
     return MaterialApp(
       title: 'Sales Platform',
@@ -29,18 +30,49 @@ class MyApp extends ConsumerWidget {
                   ? const MainAppDashboard()
                   : const OrganizationSetupScreen())
               : const VerifyEmailScreen())
-          : const SignUpScreen(),
+          : const LoginScreen(),
+      //Public routes
       routes: {
         '/login': (context) => const LoginScreen(),
         '/signup': (context) => const SignUpScreen(),
         '/freetrial': (context) => const GetFreeTrialScreen(),
-        '/dashboard': (context) => const MainAppDashboard(),
         '/verify_email': (context) => const VerifyEmailScreen(),
-        '/setup_organization': (context) => const OrganizationSetupScreen(),
-        '/choose_plan': (context) => const ChoosePlanScreen(),
-        '/payment_success': (context) => PaymentSuccessScreen(),
-          '/finalize_organization': (context) => const FinalizeOrganizationScreen(),
+        '/payment_success': (context) => const PaymentSuccessScreen(),
       },
+      //Protected routes
+      onGenerateRoute:(settings){
+        user = ref.watch(authProvider);
+        if (user == null) {
+          return MaterialPageRoute(
+            builder: (context) => const LoginScreen(),
+          );
+        }
+
+        // Handle protected routes
+        switch (settings.name) {
+          case '/dashboard':
+            return MaterialPageRoute(
+              builder: (context) => const MainAppDashboard(),
+            );
+          case '/setup_organization':
+            return MaterialPageRoute(
+              builder: (context) => const OrganizationSetupScreen(),
+            );
+          case '/choose_plan':
+            return MaterialPageRoute(
+              builder: (context) => const ChoosePlanScreen(),
+            );
+          case '/finalize_organization':
+            return MaterialPageRoute(
+              builder: (context) => const FinalizeOrganizationScreen(),
+            );
+          default:
+            // Handle unknown routes
+            return MaterialPageRoute(
+              builder: (context) => const UnknownRouteScreen(),
+            );
+        }
+      }
     );
   }
 }

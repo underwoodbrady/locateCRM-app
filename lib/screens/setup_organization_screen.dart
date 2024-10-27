@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/organization_provider.dart';
 
 class OrganizationSetupScreen extends ConsumerStatefulWidget {
-  const OrganizationSetupScreen({Key? key}) : super(key: key);
+  const OrganizationSetupScreen({super.key});
 
   @override
   _OrganizationSetupScreenState createState() => _OrganizationSetupScreenState();

@@ -14,7 +14,13 @@ class AuthNotifier extends StateNotifier<User?> {
   }
 
   Future<void> _init() async {
-    state = await _authService.getCurrentUser();
+    refreshUser();
+  }
+
+  Future<User?> refreshUser() async{
+    final user = await _authService.getCurrentUser();
+    state = user;
+    return user;
   }
 
   Future<User?> signIn(String email, String password) async {

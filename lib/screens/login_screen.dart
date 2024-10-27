@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/auth_provider.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   @override
   _LoginScreenState createState() => _LoginScreenState();
@@ -84,12 +84,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         _isLoading = true;
       });
       try {
-        await ref.read(authProvider.notifier).signIn(
+        final user = await ref.read(authProvider.notifier).signIn(
               _emailController.text,
               _passwordController.text,
             );
-        final inOrganization = ref.read(authProvider)?.organizationId;
-        print('test $inOrganization');
+
+        final inOrganization = user?.organizationId;
         if (inOrganization != null) {
           Navigator.of(context).pushReplacementNamed('/dashboard');
         } else {
