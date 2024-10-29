@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:locatecrm_app/screens/unknown_route_screen.dart';
-import 'screens/finalize_organization_screen.dart';
-import 'screens/payment_success_screen.dart';
-import 'screens/setup_organization_screen.dart';
-import 'screens/choose_plan_screen.dart';
-import 'screens/verify_email_screen.dart';
-import 'screens/login_screen.dart';
-import 'screens/signup_screen.dart';
-import 'screens/get_free_trial_screen.dart';
+import 'package:locatecrm_app/screens/auth/unknown_route_screen.dart';
+import 'screens/auth/finalize_organization_screen.dart';
+import 'screens/auth/payment_success_screen.dart';
+import 'screens/auth/setup_organization_screen.dart';
+import 'screens/auth/choose_plan_screen.dart';
+import 'screens/auth/verify_email_screen.dart';
+import 'screens/auth/login_screen.dart';
+import 'screens/auth/signup_screen.dart';
+import 'screens/auth/get_free_trial_screen.dart';
 import 'screens/main_app_dashboard.dart';
 import 'providers/auth_provider.dart';
 
@@ -20,7 +20,7 @@ class MyApp extends ConsumerWidget {
     var user = ref.watch(authProvider);
 
     return MaterialApp(
-      title: 'Sales Platform',
+      title: 'Locate CRM',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -48,7 +48,6 @@ class MyApp extends ConsumerWidget {
           );
         }
 
-        // Handle protected routes
         switch (settings.name) {
           case '/dashboard':
             return MaterialPageRoute(

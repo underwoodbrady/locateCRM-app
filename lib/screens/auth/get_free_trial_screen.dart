@@ -1,24 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../providers/auth_provider.dart';
+import '../../providers/auth_provider.dart';
 
-class LoginScreen extends ConsumerStatefulWidget {
-  const LoginScreen({super.key});
+class GetFreeTrialScreen extends ConsumerStatefulWidget {
+  const GetFreeTrialScreen({super.key});
 
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  _GetFreeTrialScreenState createState() => _GetFreeTrialScreenState();
 }
 
-class _LoginScreenState extends ConsumerState<LoginScreen> {
+class _GetFreeTrialScreenState extends ConsumerState<GetFreeTrialScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _nameController = TextEditingController();
   bool _isLoading = false;
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _nameController.dispose();
     super.dispose();
   }
 
@@ -26,7 +28,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Login'),
+        title: const Text('Get A Free Trial'),
+        automaticallyImplyLeading: false,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -35,6 +38,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+               const Text(
+                'Start With A Free Trial, No Card Required',
+                textAlign: TextAlign.left,
+              ),
+              TextFormField(
+                controller: _nameController,
+                decoration: const InputDecoration(labelText: 'Name'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your name';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
               TextFormField(
                 controller: _emailController,
                 decoration: const InputDecoration(labelText: 'Email'),
@@ -59,17 +77,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
               const SizedBox(height: 24),
               ElevatedButton(
-                onPressed: _isLoading ? null : _handleLogin,
+                onPressed: _isLoading ? null : _handleSignUp,
                 child: _isLoading
                     ? const CircularProgressIndicator()
-                    : const Text('Login'),
+                    : const Text('Sign Up'),
               ),
               const SizedBox(height: 16),
               TextButton(
                 onPressed: () {
-                  Navigator.of(context).pushReplacementNamed('/signup');
+                  Navigator.of(context).pushReplacementNamed('/login');
                 },
-                child: const Text('Sign Up Instead'),
+                child: const Text('Sign In Instead'),
               ),
             ],
           ),
@@ -78,23 +96,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
-  Future<void> _handleLogin() async {
+  Future<void> _handleSignUp() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
       });
       try {
-        final user = await ref.read(authProvider.notifier).signIn(
+        await ref.read(authProvider.notifier).signUp(
               _emailController.text,
               _passwordController.text,
+              _nameController.text,
             );
-
-        final inOrganization = user?.organizationId;
-        if (inOrganization != null) {
-          Navigator.of(context).pushReplacementNamed('/dashboard');
-        } else {
-          Navigator.of(context).pushReplacementNamed('/setup_organization');
-        }
+        Navigator.of(context).pushReplacementNamed('/verify_email');
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error: $e')),

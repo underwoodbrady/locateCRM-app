@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:html' as html;
 
-import '../providers/organization_provider.dart'; // Only for web platform
+import '../../providers/organization_provider.dart'; // Only for web platform
 
 class ChoosePlanScreen extends ConsumerStatefulWidget {
   const ChoosePlanScreen({super.key});
@@ -19,6 +19,7 @@ class _ChoosePlanScreenState extends ConsumerState<ChoosePlanScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Choose Plan'),
+        automaticallyImplyLeading: false,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

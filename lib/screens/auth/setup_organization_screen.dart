@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../providers/organization_provider.dart';
+import '../../providers/organization_provider.dart';
 
 class OrganizationSetupScreen extends ConsumerStatefulWidget {
   const OrganizationSetupScreen({super.key});
 
   @override
-  _OrganizationSetupScreenState createState() => _OrganizationSetupScreenState();
+  _OrganizationSetupScreenState createState() =>
+      _OrganizationSetupScreenState();
 }
 
-class _OrganizationSetupScreenState extends ConsumerState<OrganizationSetupScreen> {
+class _OrganizationSetupScreenState
+    extends ConsumerState<OrganizationSetupScreen> {
   final _formKey = GlobalKey<FormState>();
   final _organizationIdController = TextEditingController();
   bool _isLoading = false;
@@ -26,6 +28,7 @@ class _OrganizationSetupScreenState extends ConsumerState<OrganizationSetupScree
     return Scaffold(
       appBar: AppBar(
         title: const Text('Setup Organization'),
+        automaticallyImplyLeading: false,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -57,7 +60,8 @@ class _OrganizationSetupScreenState extends ConsumerState<OrganizationSetupScree
                   children: [
                     TextFormField(
                       controller: _organizationIdController,
-                      decoration: const InputDecoration(labelText: 'Organization ID'),
+                      decoration:
+                          const InputDecoration(labelText: 'Organization ID'),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Please enter an organization ID';
@@ -72,13 +76,14 @@ class _OrganizationSetupScreenState extends ConsumerState<OrganizationSetupScree
                           ? const CircularProgressIndicator()
                           : const Text('Join Organization'),
                     ),
-                   TextButton(
-                onPressed: () {
- setState(() {
-                    _showJoinForm = false;
-                  });                },
-                child: const Text('Go Back'),
-              ),
+                    TextButton(
+                      onPressed: () {
+                        setState(() {
+                          _showJoinForm = false;
+                        });
+                      },
+                      child: const Text('Go Back'),
+                    ),
                   ],
                 ),
               ),
@@ -90,38 +95,38 @@ class _OrganizationSetupScreenState extends ConsumerState<OrganizationSetupScree
   }
 
   Future<void> _handleJoinOrganization() async {
-  if (_formKey.currentState!.validate()) {
-    setState(() {
-      _isLoading = true;
-    });
-    try {
-      await ref.read(organizationProvider.notifier).joinOrganization(
-            _organizationIdController.text,
-          );
-      
-      // Show success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Successfully joined organization'),
-          backgroundColor: Colors.green,
-        ),
-      );
-
-      // Navigate to dashboard
-      Navigator.of(context).pushReplacementNamed('/dashboard');
-    } catch (e) {
-      // Show error message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.toString()),
-          backgroundColor: Colors.red,
-        ),
-      );
-    } finally {
+    if (_formKey.currentState!.validate()) {
       setState(() {
-        _isLoading = false;
+        _isLoading = true;
       });
+      try {
+        await ref.read(organizationProvider.notifier).joinOrganization(
+              _organizationIdController.text,
+            );
+
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Successfully joined organization'),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        // Navigate to dashboard
+        Navigator.of(context).pushReplacementNamed('/dashboard');
+      } catch (e) {
+        // Show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString()),
+            backgroundColor: Colors.red,
+          ),
+        );
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
-}
 }
